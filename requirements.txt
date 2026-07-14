@@ -1,0 +1,9 @@
+sarvamai
+langgraph
+langchain
+mcp[cli]
+jupyter
+numpy
+soundfile
+webrtcvad-wheels
+requests

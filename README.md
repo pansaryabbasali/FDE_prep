@@ -28,6 +28,27 @@ and interview execution (Day 2 evening). Two hands-on builds anchor it, because 
 reported interview format is a practical hackathon (one reported task: build a Voice Activity
 Detector from scratch), not LeetCode.
 
+## Doing the hands-on work with no local machine
+
+You don't need a laptop setup — run everything in the browser:
+
+1. **GitHub Codespaces** (main environment): on this repo's page click **Code → Codespaces →
+   Create codespace**. You get VS Code + a Linux terminal in the browser, running on GitHub's
+   servers. The `.devcontainer/` in this repo auto-installs everything in `requirements.txt`
+   (sarvamai, langgraph, mcp, jupyter, numpy, audio libs) on first boot. Free personal quota
+   is 120 core-hours/month — ~60 hours on the default 2-core machine, more than the whole
+   sprint needs. Codespaces auto-stop when idle, so the quota stretches.
+   - Put your Sarvam API key in the terminal each session: `export SARVAM_API_KEY=sk_...`
+     (or add it once as a Codespaces secret: repo → Settings → Secrets → Codespaces).
+   - Commit your build work from the Codespace terminal with plain `git add/commit/push` —
+     it's already authenticated to this repo.
+2. **Google Colab** (for notebooks): the sarvam-ai-cookbook and langchain-academy notebooks
+   run fine on the free tier — open https://colab.research.google.com, File → Open notebook →
+   GitHub tab, paste the repo URL. Zero setup, good for quick API experiments.
+3. **Audio caveat**: cloud environments have no microphone. For the Day 2 voice build, work
+   file-to-file (WAV in → WAV out) exactly as the plan's fallback describes — the learning is
+   in the streaming APIs and buffers, not the mic.
+
 ## Timeboxes at a glance
 
 | | Morning | Afternoon | Evening |
