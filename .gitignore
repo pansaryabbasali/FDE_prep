@@ -1,0 +1,15 @@
+# Cloned reference repos (downloaded working material, not our code)
+sarvam-ai-cookbook/
+langchain-academy/
+
+# Scratch practice code (keep out of the repo unless you want it in)
+scratch/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# Secrets — never commit API keys
+.env
