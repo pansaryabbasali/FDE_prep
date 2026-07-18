@@ -38,10 +38,14 @@
   .block .btitle { font-weight: 600; font-size: 0.95rem; flex: 1; }
   .block input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--done); cursor: pointer; flex-shrink: 0; }
   .block .body { padding: 0 14px 14px 14px; border-top: 1px solid var(--border); font-size: 0.92rem; }
-  .block .body ul { padding-left: 20px; margin: 10px 0; }
-  .block .body li { margin-bottom: 6px; }
-  .donewhen { background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; font-size: 0.88rem; margin-top: 8px; }
-  .donewhen b { color: var(--accent); }
+  .block .body ul, .block .body ol { padding-left: 20px; margin: 10px 0; }
+  .block .body li { margin-bottom: 7px; }
+  .goal { background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; font-size: 0.88rem; margin: 10px 0 4px; }
+  .goal b { color: var(--accent); }
+  .donewhen { border-left: 3px solid var(--done); background: var(--done-soft); border-radius: 0 8px 8px 0; padding: 8px 12px; font-size: 0.88rem; margin-top: 10px; }
+  .donewhen b { color: var(--done); }
+  .rsrc { border-top: 1px dashed var(--border); margin-top: 10px; padding-top: 8px; }
+  .rsrc .rh { font-size: 0.75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
   .progress-wrap { margin: 4px 0 16px; }
   .progress-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
   .progress { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
@@ -52,7 +56,6 @@
   .scroll { overflow-x: auto; }
   h2 { font-size: 1.05rem; margin: 20px 0 8px; }
   h3 { font-size: 0.95rem; margin: 14px 0 6px; }
-  .pill { display: inline-block; font-size: 0.72rem; background: var(--accent-soft); color: var(--accent); border-radius: 10px; padding: 1px 8px; margin-left: 6px; font-weight: 600; }
   .tag { font-size: 0.72rem; color: var(--muted); }
   .kbd { background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; font-size: .85em; }
   .note { color: var(--muted); font-size: 0.85rem; }
@@ -63,7 +66,7 @@
 <body>
 <header>
   <h1>Sarvam FDE — 2-Day Sprint</h1>
-  <p class="sub">Click a tab. Check off blocks as you go — progress saves in this browser. <button class="reset" onclick="resetProgress()">reset progress</button></p>
+  <p class="sub">Click a tab. Expand a block for full step-by-step instructions. Check off blocks as you go — progress saves in this browser. <button class="reset" onclick="resetProgress()">reset progress</button></p>
 </header>
 <nav id="nav"></nav>
 <main id="main"></main>
@@ -72,80 +75,282 @@
 // ---------- Day plan data ----------
 const days = [
 { id:"day1", label:"Day 1", title:"Day 1 — Agents, Evals, Sarvam Platform (~13 hrs)",
-  intro:"Convert watsonx experience into the open-ecosystem stack; build the evals talk track. Rules: type code yourself; after each block write 3 flashcard bullets in notes.md.",
+  intro:"Convert watsonx experience into the open-ecosystem stack; build the evals talk track. Two rules all day: type every line of code yourself (no copy-paste-skim), and after each block write 3 flashcard bullets in notes.md.",
   blocks:[
-  { t:"08:00–08:30", title:"Setup", html:`<ul>
-    <li>Account at <a href="https://dashboard.sarvam.ai" target="_blank">dashboard.sarvam.ai</a> → API key (free credits).</li>
-    <li><span class="kbd">pip install sarvamai langgraph langchain "mcp[cli]"</span></li>
-    <li>Clone <a href="https://github.com/sarvamai/sarvam-ai-cookbook" target="_blank">sarvam-ai-cookbook</a> and <a href="https://github.com/langchain-ai/langchain-academy" target="_blank">langchain-academy</a>.</li>
-    <li>Skim <a href="https://docs.sarvam.ai/api-reference-docs/getting-started/quickstart" target="_blank">docs quickstart</a>; sanity-check one TTS/translate call.</li></ul>`},
-  { t:"08:30–09:30", title:"Canonical agent vocabulary (2 essays)", html:`<ul>
-    <li><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank">Anthropic: Building Effective AI Agents</a> (30m) — memorize workflows vs agents + 5 patterns: prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer.</li>
-    <li><a href="https://www.anthropic.com/engineering/built-multi-agent-research-system" target="_blank">Anthropic: multi-agent research system</a> (25m) — best war story to cite.</li></ul>
-    <div class="donewhen"><b>Done when:</b> you can sketch all 5 patterns from memory and name which one your watsonx defense pipeline is (orchestrator-workers + routing).</div>`},
-  { t:"09:30–12:30", title:"LangGraph sprint (priority #1 gap)", html:`<ul>
-    <li><a href="https://academy.langchain.com/courses/langgraph-essentials-python" target="_blank">LangGraph Essentials</a> (~2.5h): StateGraph, nodes/edges/conditional edges, reducers, checkpointers, threads, interrupt() + Command, streaming.</li>
-    <li>30m on <a href="https://docs.langchain.com/oss/python/langgraph/interrupts" target="_blank">interrupts/persistence docs</a> — the exact interview probes.</li>
-    <li>Run 2–3 notebooks from <a href="https://github.com/langchain-ai/langchain-academy" target="_blank">langchain-academy</a> Modules 1–3.</li></ul>
-    <div class="donewhen"><b>Done when:</b> from an empty file, you can build a tool-calling agent with state, a conditional edge, and a checkpointer in &lt;20 min without docs.</div>`},
-  { t:"12:30–13:00", title:"Lunch (away from screen)", html:`<p class="note">Rest is part of the plan.</p>`},
-  { t:"13:00–14:00", title:"Framework breadth pass (map, don't master)", html:`<ul>
-    <li><a href="https://google.github.io/adk-docs/get-started/" target="_blank">Google ADK get-started</a> (30m): LlmAgent vs Sequential/Parallel/Loop workflow agents — maps 1:1 to the Anthropic patterns and your watsonx Orchestrate mental model.</li>
-    <li><a href="https://developers.llamaindex.ai/python/framework/use_cases/agents/" target="_blank">LlamaIndex agents</a> + <a href="https://www.llamaindex.ai/blog/agentic-rag-with-llamaindex-2721b8a49ff6" target="_blank">agentic RAG post</a> (30m): FunctionAgent, event-driven Workflows, query routing, sub-question decomposition.</li>
-    <li>If ahead: <a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK</a> primitives.</li></ul>
-    <div class="donewhen"><b>Done when:</b> for each framework you can fill: "In LangGraph it's X, in Google ADK it's Y, in watsonx Orchestrate I did it with Z."</div>`},
-  { t:"14:00–15:00", title:"MCP — build a toy server", html:`<ul>
-    <li><a href="https://modelcontextprotocol.io/docs/develop/build-server" target="_blank">Build-a-server quickstart</a> (45m): FastMCP weather server, wire into an MCP client, call it.</li>
-    <li>15m: README of <a href="https://github.com/sarvamai/sarvam-mcp" target="_blank">sarvam-mcp</a> — also the best map of their API surface. Know: open governance, tools/resources/prompts, Streamable HTTP + OAuth for remote.</li></ul>
-    <div class="donewhen"><b>Done when:</b> your server answers a tool call and you can explain why an FDE ships an MCP server instead of a bespoke integration.</div>`},
-  { t:"15:00–17:30", title:"Evals deep block (THE differentiator)", html:`<ol>
-    <li><a href="https://hamel.dev/blog/posts/evals/" target="_blank">Hamel: Your AI Product Needs Evals</a> (40m) — 3 levels: assertions → human+model eval → A/B.</li>
-    <li><a href="https://hamel.dev/blog/posts/evals-faq/" target="_blank">Hamel + Shreya: Evals FAQ</a> (~90m) — error analysis first (~20 real traces before dashboards), binary &gt; Likert, align LLM-judge to humans (TPR/TNR), debug RAG stage-by-stage.</li>
-    <li><a href="https://eugeneyan.com/writing/llm-evaluators/" target="_blank">Eugene Yan: LLM-as-Judge</a> (skim 30m) — position/verbosity/self-preference biases.</li>
-    <li>20m tooling skim: <a href="https://docs.ragas.io/" target="_blank">Ragas</a>, <a href="https://www.promptfoo.dev/docs/intro/" target="_blank">promptfoo</a>, LangSmith agentevals; names: Braintrust, DeepEval, Arize Phoenix. Sarvam's own: <a href="https://github.com/sarvamai/llm_wer" target="_blank">llm_wer</a>, <a href="https://github.com/sarvamai/llm_intent_entity" target="_blank">llm_intent_entity</a>.</li>
-    <li>Last 20m: write YOUR one-page evals playbook (signal vs noise, final-answer vs trajectory evals, offline vs online, week-1-at-a-client plan).</li></ol>
-    <div class="donewhen"><b>Done when:</b> you can answer "how would you evaluate a bank's multilingual voice agent?" for 5 min straight: task success per intent, code-mixed WER, tool-call correctness, latency percentiles, escalation rate, judge-vs-human agreement.</div>`},
+
+  { t:"08:00–08:30", title:"Setup — environment + API key", html:`
+    <div class="goal"><b>Goal:</b> a working cloud environment and a verified Sarvam API call, so zero time is lost to plumbing later.</div>
+    <ol>
+      <li>Create an account at <a href="https://dashboard.sarvam.ai" target="_blank">dashboard.sarvam.ai</a> → <b>API Keys</b> → generate a key (<span class="kbd">sk_...</span>). You get free credits on signup.</li>
+      <li>Open your Codespace: repo page → green <b>Code</b> button → <b>Codespaces</b> → <b>Create codespace</b>. Wait ~2 min; the devcontainer auto-installs everything in <span class="kbd">requirements.txt</span> (sarvamai, langgraph, mcp, jupyter, numpy, audio libs).</li>
+      <li>In the Codespace terminal: <span class="kbd">export SARVAM_API_KEY=sk_...</span> — or store it permanently: repo → Settings → Secrets and variables → <b>Codespaces</b> → New secret named <span class="kbd">SARVAM_API_KEY</span> (then restart the Codespace).</li>
+      <li>Clone the two working repos:<br><span class="kbd">git clone https://github.com/sarvamai/sarvam-ai-cookbook</span><br><span class="kbd">git clone https://github.com/langchain-ai/langchain-academy</span></li>
+      <li>Verify the key works: open any notebook in <span class="kbd">sarvam-ai-cookbook/notebooks/translate</span> (or tts) with <span class="kbd">jupyter lab</span>, run one call, confirm you get a response.</li>
+      <li>Bookmark in your browser: <a href="https://docs.sarvam.ai/api-reference-docs/getting-started/quickstart" target="_blank">docs quickstart</a> and <a href="https://docs.sarvam.ai/llms.txt" target="_blank">docs.sarvam.ai/llms.txt</a> (their machine-readable docs index — paste it to any LLM for instant API help).</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Resources</div><ul>
+      <li><a href="https://dashboard.sarvam.ai" target="_blank">Sarvam dashboard (API keys)</a> · <a href="https://docs.sarvam.ai" target="_blank">docs.sarvam.ai</a> · <a href="https://docs.sarvam.ai/api-reference-docs/pricing" target="_blank">pricing</a> · <a href="https://docs.sarvam.ai/api-reference-docs/ratelimits" target="_blank">rate limits</a></li>
+      <li><a href="https://github.com/sarvamai/sarvam-ai-cookbook" target="_blank">sarvam-ai-cookbook</a> (notebooks + example apps) · <a href="https://github.com/langchain-ai/langchain-academy" target="_blank">langchain-academy notebooks</a></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> one Sarvam API call returns successfully from your Codespace terminal or a notebook.</div>`},
+
+  { t:"08:30–09:30", title:"Canonical agent vocabulary — 2 essays", html:`
+    <div class="goal"><b>Goal:</b> speak the 2026 agent vocabulary fluently — every framework you touch today is a dialect of these two essays.</div>
+    <ol>
+      <li>(30 min) Read <a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank">Anthropic — "Building Effective AI Agents"</a>. As you read, write down: the <b>workflows vs agents</b> distinction, and the <b>5 workflow patterns</b> — prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer — plus the thesis: <i>start simple, add autonomy only when needed</i>.</li>
+      <li>(5 min) On paper, sketch each of the 5 patterns as boxes and arrows, from memory. Redo any you can't.</li>
+      <li>(25 min) Read <a href="https://www.anthropic.com/engineering/built-multi-agent-research-system" target="_blank">Anthropic — "How we built our multi-agent research system"</a>. Note 3 production lessons (e.g., orchestrator token economics, eval methodology with LLM-judges, why parallel sub-agents help research but not coding). This is your citable multi-agent war story.</li>
+      <li>Write 3 flashcards in <span class="kbd">notes.md</span>.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Optional deeper</div><ul>
+      <li><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf" target="_blank">OpenAI — A Practical Guide to Building Agents (PDF)</a> <span class="tag">45m, same ideas from the other lab</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> you can sketch all 5 patterns from memory and name which one your watsonx defense document-pipeline is (orchestrator-workers + routing).</div>`},
+
+  { t:"09:30–12:30", title:"LangGraph sprint — hands-on (priority #1 gap)", html:`
+    <div class="goal"><b>Goal:</b> go from "never used LangGraph" to "built agents in it" — the JD names it and interviewers probe it.</div>
+    <ol>
+      <li>(~2.5 h) Enroll free in <a href="https://academy.langchain.com/courses/langgraph-essentials-python" target="_blank">LangGraph Essentials (Python)</a> on LangChain Academy. <b>Retype every example</b> in your Codespace under <span class="kbd">scratch/langgraph/</span> — don't just watch.</li>
+      <li>Concept checklist — tick each one off as you've personally typed it:<br>
+        ☐ <span class="kbd">StateGraph</span> + typed state with reducers &nbsp;☐ nodes &amp; normal edges &nbsp;☐ conditional edges &nbsp;☐ tool-calling node (bind_tools / ToolNode) &nbsp;☐ checkpointer (<span class="kbd">MemorySaver</span>) + <span class="kbd">thread_id</span> &nbsp;☐ <span class="kbd">interrupt()</span> + <span class="kbd">Command(resume=...)</span> for human-in-the-loop &nbsp;☐ streaming modes</li>
+      <li>(30 min) Read the official docs on <a href="https://docs.langchain.com/oss/python/langgraph/interrupts" target="_blank">interrupts / human-in-the-loop</a> and the sibling persistence page — these two concepts are the most common interview probes. Note: LangGraph 1.0 (late 2025) docs live at docs.langchain.com.</li>
+      <li>(30 min) In your cloned <span class="kbd">langchain-academy</span> repo, run 2–3 notebooks from Modules 1–3 of <a href="https://academy.langchain.com/courses/intro-to-langgraph" target="_blank">Introduction to LangGraph</a> (the deeper course — use it as a notebook source, not another video sitting).</li>
+      <li>Capstone drill (timed, 20 min): from an <b>empty file</b>, build a tool-calling agent with state, one conditional edge, and a checkpointer — no docs allowed. If you fail, review and retry after lunch.</li>
+      <li>3 flashcards in <span class="kbd">notes.md</span>.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Resources</div><ul>
+      <li><a href="https://academy.langchain.com/courses/langgraph-essentials-python" target="_blank">LangGraph Essentials</a> <span class="tag">2–3h, free</span> · <a href="https://academy.langchain.com/courses/intro-to-langgraph" target="_blank">Intro to LangGraph</a> <span class="tag">Modules 1–3 ≈ 3h</span> · <a href="https://github.com/langchain-ai/langchain-academy" target="_blank">course notebooks</a></li>
+      <li><a href="https://docs.langchain.com/oss/python/langgraph/interrupts" target="_blank">interrupts docs</a> <span class="tag">the exact interview probes</span></li>
+      <li>Optional: <a href="https://www.deeplearning.ai/short-courses/long-term-agentic-memory-with-langgraph/" target="_blank">DL.AI — Long-Term Agentic Memory with LangGraph</a> <span class="tag">1.5h · semantic/episodic/procedural memory, taught by Harrison Chase</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> the capstone drill passes — empty file → working tool-calling agent with conditional edge + checkpointer in under 20 minutes, no docs.</div>`},
+
+  { t:"12:30–13:00", title:"Lunch (away from screen)", html:`<p class="note">Rest is part of the plan. Eyes off screens.</p>`},
+
+  { t:"13:00–14:00", title:"Framework breadth pass — map, don't master", html:`
+    <div class="goal"><b>Goal:</b> speak Google ADK and LlamaIndex (both JD-named) well enough to map every concept onto what you already know.</div>
+    <ol>
+      <li>(30 min) <a href="https://google.github.io/adk-docs/get-started/" target="_blank">Google ADK — Get Started</a>, skimming toward the <a href="https://adk.dev/tutorials/agent-team/" target="_blank">agent-team tutorial</a>. Nail one distinction: <span class="kbd">LlmAgent</span> (model decides) vs <b>workflow agents</b> — <span class="kbd">Sequential</span>/<span class="kbd">Parallel</span>/<span class="kbd">Loop</span> (code decides). Notice these are literally Anthropic's workflow patterns as classes. ADK 2.0 went GA June 2026.</li>
+      <li>(30 min) <a href="https://developers.llamaindex.ai/python/framework/use_cases/agents/" target="_blank">LlamaIndex — agents</a> + skim <a href="https://www.llamaindex.ai/blog/agentic-rag-with-llamaindex-2721b8a49ff6" target="_blank">Agentic RAG with LlamaIndex</a>. Know: <span class="kbd">FunctionAgent</span>, event-driven Workflows, query routing, sub-question decomposition — this one plays straight to your RAG strength.</li>
+      <li>Fill in a translation table in <span class="kbd">notes.md</span> — one row per concept: <i>"In LangGraph it's X · in Google ADK it's Y · in watsonx Orchestrate I did it with Z."</i> Rows: agent definition, deterministic flow, parallelism, state/memory, human-in-the-loop, tool registration.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">If ahead of schedule</div><ul>
+      <li><a href="https://openai.github.io/openai-agents-python/" target="_blank">OpenAI Agents SDK</a> <span class="tag">4 primitives: agents, handoffs, guardrails, sessions/tracing</span></li>
+      <li><a href="https://github.com/humanlayer/12-factor-agents" target="_blank">12-Factor Agents</a> <span class="tag">45m · "tool use is just structured output + a switch statement" — very quotable</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> your translation table has all six rows filled and you could narrate any row out loud.</div>`},
+
+  { t:"14:00–15:00", title:"MCP — build a toy server", html:`
+    <div class="goal"><b>Goal:</b> have personally built and called an MCP server (the JD mentions MCP servers explicitly).</div>
+    <ol>
+      <li>(45 min) Follow the official <a href="https://modelcontextprotocol.io/docs/develop/build-server" target="_blank">Build-a-server quickstart</a>: the classic weather server using <span class="kbd">FastMCP</span> and <span class="kbd">@mcp.tool()</span>. Type it yourself in <span class="kbd">scratch/mcp/</span>.</li>
+      <li>Test it without Claude Desktop (you're in a Codespace): run the <b>MCP Inspector</b> — <span class="kbd">npx @modelcontextprotocol/inspector python server.py</span> — and invoke your tool from the Inspector UI. Alternatively write a 10-line Python MCP client from the same docs.</li>
+      <li>(15 min) Read the README of <a href="https://github.com/sarvamai/sarvam-mcp" target="_blank">sarvam-mcp</a> — Sarvam's official server (<span class="kbd">uvx sarvam-mcp</span>). It doubles as the best condensed map of their entire API surface. Note their second <span class="kbd">sarvam_code_*</span> namespace of builder tools.</li>
+      <li>Memorize the 2026 facts: MCP is under open governance, adopted by OpenAI/Google/Microsoft; primitives = <b>tools / resources / prompts</b>; Streamable HTTP transport + OAuth for remote servers.</li>
+      <li>3 flashcards in <span class="kbd">notes.md</span>.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Resources</div><ul>
+      <li><a href="https://modelcontextprotocol.io/docs/getting-started/intro" target="_blank">MCP intro</a> → <a href="https://modelcontextprotocol.io/docs/develop/build-server" target="_blank">build-server quickstart</a></li>
+      <li>Optional deeper: <a href="https://anthropic.skilljar.com/introduction-to-model-context-protocol" target="_blank">Anthropic Academy MCP course</a> <span class="tag">2–3h, free + certificate</span> · <a href="https://simplescraper.io/blog/how-to-mcp" target="_blank">"How to MCP"</a> <span class="tag">45m · remote servers, auth, deployment</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> your server answers a tool call in the Inspector, and you can explain in one sentence why an FDE ships a client an MCP server instead of a bespoke integration.</div>`},
+
+  { t:"15:00–17:30", title:"Evals deep block — THE differentiator", html:`
+    <div class="goal"><b>Goal:</b> walk into the interview with clear, opinionated answers on "what good evaluation looks like versus what's just noise" (the JD's exact phrase). Reading block; the practice comes tonight in Build #1.</div>
+    <ol>
+      <li>(40 min) <a href="https://hamel.dev/blog/posts/evals/" target="_blank">Hamel Husain — "Your AI Product Needs Evals"</a>. Internalize the three levels: unit tests/assertions → human + model eval → A/B tests, and the "look at your data" culture.</li>
+      <li>(~90 min) <a href="https://hamel.dev/blog/posts/evals-faq/" target="_blank">Hamel + Shreya Shankar — the Evals FAQ</a> (updated Jan 2026; <a href="https://hamel.dev/blog/posts/evals-faq/evals-faq.pdf" target="_blank">PDF version</a>). The highest-ROI eval read in existence. Positions to internalize: <b>error analysis first</b> (read ~20+ real traces before building any dashboard) · binary judgments beat Likert scales · an LLM-judge must be <b>aligned to a human</b> (measure its TPR/TNR against your labels) · debug RAG pipelines stage-by-stage.</li>
+      <li>(30 min, skim) <a href="https://eugeneyan.com/writing/llm-evaluators/" target="_blank">Eugene Yan — "LLM-Evaluators (LLM-as-Judge)"</a>. Know the judge biases: position, verbosity, self-preference; pairwise vs direct scoring.</li>
+      <li>(20 min) Tooling skim so you name-drop accurately: <a href="https://docs.ragas.io/" target="_blank">Ragas</a> (faithfulness, answer relevancy, context precision/recall) · <a href="https://www.promptfoo.dev/docs/intro/" target="_blank">promptfoo</a> (YAML-driven, red-teaming) · LangSmith <b>agentevals</b> (trajectory evals) · names: Braintrust, DeepEval, Arize Phoenix. Also Sarvam's own eval repos — cite these in the interview: <a href="https://github.com/sarvamai/llm_wer" target="_blank">llm_wer</a> and <a href="https://github.com/sarvamai/llm_intent_entity" target="_blank">llm_intent_entity</a>.</li>
+      <li>(20 min) Write <b>your one-page evals playbook</b> in the marked section of <span class="kbd">notes.md</span> — in your own words: signal vs noise · final-answer evals vs <b>trajectory</b> evals (tool-call correctness, loop detection, step efficiency) · offline vs online · when an LLM-judge is trustworthy · your week-1-at-a-client plan (error analysis on real traces → ~20 hand-labeled examples → binary rubric → then automate).</li>
+    </ol>
+    <div class="donewhen"><b>Done when:</b> you can answer "how would you evaluate a bank's multilingual voice agent?" for 5 minutes without hesitation — task success per intent, code-mixed WER, tool-call correctness, latency percentiles, escalation rate, judge-vs-human agreement.</div>`},
+
   { t:"17:30–18:00", title:"Break", html:`<p class="note">Walk. Eat. No screens.</p>`},
-  { t:"18:00–20:30", title:"Build #1 — Sarvam-stack agent + eval harness", html:`<p><b>Option A (recommended):</b> BFSI call analytics — cookbook <a href="https://github.com/sarvamai/sarvam-ai-cookbook" target="_blank">call-analytics example</a>: Saaras v3 STT (modes: transcribe/translate/verbatim/transliterate/<b>code-mixed</b>) → chat completion for intent/entities/summary as structured JSON → report.<br><b>Option B:</b> multilingual doc Q&amp;A via Sarvam Vision async jobs → chunk → retrieve → cited answers.</p>
-    <p>Non-negotiable: (1) JSON-schema structured output + retry-on-invalid (reasoning can eat the budget → <span class="kbd">content=None</span> — real documented gotcha); (2) tiny eval harness: 10–15 hand-written cases + binary LLM-judge + pass-rate table; (3) commit to <span class="kbd">build-1/</span>.</p>
-    <p class="note">Shortcut: <span class="kbd">npx skills add sarvamai/skills</span> — <a href="https://github.com/sarvamai/skills" target="_blank">their condensed SDK reference + gotchas</a>.</p>`},
-  { t:"20:30–21:30", title:"Context engineering (connects to your RAG scars)", html:`<ul>
-    <li><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank">Anthropic: context engineering</a> (30m) — compaction, note-taking, sub-agent isolation, JIT retrieval.</li>
-    <li><a href="https://www.langchain.com/blog/context-engineering-for-agents" target="_blank">Lance Martin</a> (20m) — <b>Write / Select / Compress / Isolate</b>.</li>
-    <li><a href="https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus" target="_blank">Manus lessons</a> (25m) — KV-cache hit rate = #1 metric (~10x cost), mask-don't-remove tools, filesystem-as-context, keep errors in context.</li>
-    <li>Skim <a href="https://research.trychroma.com/context-rot" target="_blank">Chroma: Context Rot</a> (15m). <b>Your hook:</b> you tuned against lost-in-the-middle on a 128K RCA system before it had a name.</li></ul>`},
-  { t:"21:30–22:00", title:"Flashcards + RAG-2026 skim", html:`<p><a href="https://www.anthropic.com/news/contextual-retrieval" target="_blank">Contextual Retrieval</a> (embeddings + BM25 + reranking; "&lt;200K tokens → long context + caching" rule). One-liner for "is RAG dead?": <i>"RAG is now the retrieval subsystem of context engineering — hybrid search + reranking still wins on cost, latency, freshness at enterprise corpus sizes."</i></p>`},
+
+  { t:"18:00–20:30", title:"Build #1 — Sarvam-stack agent + eval harness", html:`
+    <div class="goal"><b>Goal:</b> a real, runnable thing on Sarvam's APIs with your evals playbook made concrete. Full brief lives in <span class="kbd">build-1/README.md</span> in the repo.</div>
+    <p><b>Option A (recommended) — BFSI call analytics</b> (mirrors their Samvaad business):</p>
+    <ol>
+      <li>Start from the cookbook's <span class="kbd">call-analytics</span> example (sample call audio included in <span class="kbd">sample_data/</span>).</li>
+      <li>Transcribe with <b>Saaras v3</b> — try two modes on the same file: <span class="kbd">transcribe</span> and <span class="kbd">code-mixed</span>; diff the outputs (interview gold). Model docs: <a href="https://docs.sarvam.ai/api-reference-docs/models/saaras" target="_blank">Saaras</a>.</li>
+      <li>Pass the transcript to a Sarvam chat completion (OpenAI-compatible endpoint) to extract <b>intent, entities, summary as structured JSON</b> against a schema you define.</li>
+      <li>Print a small per-call report.</li>
+    </ol>
+    <p><b>Option B — multilingual doc Q&amp;A</b> (mirrors your state-gov work): Sarvam Vision doc parsing (async job API: init → signed-URL upload → poll → download) → chunk → retrieve → answer with citations.</p>
+    <p><b>Non-negotiables, whichever option:</b></p>
+    <ol>
+      <li>Structured output with a JSON schema + a <b>retry-on-invalid path</b> — know the documented gotcha: chat <span class="kbd">content</span> can be <span class="kbd">None</span> when reasoning consumes the token budget.</li>
+      <li>An eval harness: 10–15 hand-written test cases + one binary-rubric LLM-judge + a pass-rate table printed at the end.</li>
+      <li>Type it yourself; commit to <span class="kbd">build-1/</span> and push.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Resources</div><ul>
+      <li><a href="https://github.com/sarvamai/sarvam-ai-cookbook" target="_blank">sarvam-ai-cookbook</a> (call-analytics, stt, chat, doc-intelligence notebooks)</li>
+      <li><a href="https://github.com/sarvamai/skills" target="_blank">sarvamai/skills</a> — condensed SDK reference with exact signatures + gotchas (<span class="kbd">npx skills add sarvamai/skills</span>)</li>
+      <li><a href="https://docs.sarvam.ai/api-reference-docs/getting-started/quickstart" target="_blank">API docs</a> · <a href="https://docs.sarvam.ai/llms.txt" target="_blank">llms.txt</a></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> one command processes real audio/docs end-to-end and prints an eval pass-rate table — and every design choice is one you can defend out loud.</div>`},
+
+  { t:"20:30–21:30", title:"Context engineering — connects to your RAG scars", html:`
+    <div class="goal"><b>Goal:</b> attach the 2026 vocabulary to production experience you already have (you fought lost-in-the-middle on a 128K RCA system before it had a name).</div>
+    <ol>
+      <li>(30 min) <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank">Anthropic — "Effective context engineering for AI agents"</a>: context as finite resource, "right-altitude" system prompts, compaction, structured note-taking, sub-agent isolation, just-in-time retrieval.</li>
+      <li>(20 min) <a href="https://www.langchain.com/blog/context-engineering-for-agents" target="_blank">Lance Martin — "Context Engineering for Agents"</a>: memorize the <b>Write / Select / Compress / Isolate</b> taxonomy — the cleanest framework to recite.</li>
+      <li>(25 min) <a href="https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus" target="_blank">Manus — "Lessons from Building Manus"</a>: KV-cache hit rate as the #1 production metric (~10x cost delta) · mask-don't-remove tools · filesystem-as-context · recitation (todo.md) · keep errors in context.</li>
+      <li>(15 min, skim) <a href="https://research.trychroma.com/context-rot" target="_blank">Chroma — "Context Rot"</a>: 18 models, performance degrades non-uniformly with input length — the empirical successor to "lost in the middle". Cite it when arguing retrieval/compaction over "just use 1M context".</li>
+      <li>In <span class="kbd">notes.md</span>: write your own AIOps-RCA story re-told in this vocabulary (which of Write/Select/Compress/Isolate you actually did).</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Optional</div><ul><li><a href="https://rlancemartin.github.io/2025/10/15/manus/" target="_blank">Lance Martin's Manus deep-dive</a> <span class="tag">20m synthesis</span></li></ul></div>
+    <div class="donewhen"><b>Done when:</b> you can recite Write/Select/Compress/Isolate and map each to a concrete thing you did on the RCA system.</div>`},
+
+  { t:"21:30–22:00", title:"Flashcards + RAG-2026 skim", html:`
+    <div class="goal"><b>Goal:</b> close the day with review, and let the RAG-2026 positioning marinate overnight (light touch — RAG is your strength).</div>
+    <ol>
+      <li>Review every flashcard written today; rewrite the weak ones.</li>
+      <li>(25 min) <a href="https://www.anthropic.com/news/contextual-retrieval" target="_blank">Anthropic — "Contextual Retrieval"</a>: contextual embeddings + contextual BM25 + reranking cut retrieval failures ~67%; note the rule <i>"&lt;200K tokens → just use long context + prompt caching."</i></li>
+      <li>Memorize the one-liner for "is RAG dead?": <i>"RAG is now the retrieval subsystem of context engineering — hybrid search + reranking still wins on cost, latency, and freshness at enterprise corpus sizes."</i></li>
+    </ol>
+    <div class="rsrc"><div class="rh">If you want more (optional)</div><ul>
+      <li><a href="https://www.firecrawl.dev/blog/best-chunking-strategies-rag" target="_blank">Chunking strategies for RAG in 2026</a> <span class="tag">25m · current defaults: recursive 400–512 tok, 10–20% overlap</span></li>
+      <li><a href="https://ragflow.io/blog/rag-review-2025-from-rag-to-context" target="_blank">RAGFlow — From RAG to Context</a> <span class="tag">40m · state-of-the-field synthesis</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> flashcards reviewed and lights out by 22:30 — retention beats one more blog post.</div>`},
 ]},
+
 { id:"day2", label:"Day 2", title:"Day 2 — Voice, Systems, Interview Execution (~13 hrs)",
-  intro:"Sarvam's business is voice-first conversational AI for BFSI. Build the voice depth, add distributed-systems vocabulary, memorize their stack, rehearse the interview.",
+  intro:"Sarvam's business is voice-first conversational AI for BFSI (Samvaad ≈ 80% of revenue). Today: build the voice depth the resume lacks, bolt on distributed-systems vocabulary, memorize their stack, rehearse the actual interview.",
   blocks:[
-  { t:"08:00–10:30", title:"Voice-agent architecture (top reading of the sprint)", html:`<ul>
-    <li><a href="https://voiceaiandvoiceagents.com/" target="_blank">Voice AI &amp; Voice Agents: An Illustrated Primer</a> (~2h; canonical). Pressed? <a href="https://www.joeywang.blog/blog/voice-ai" target="_blank">condensed notes</a> (30m).</li>
-    <li><a href="https://livekit.com/blog/voice-agent-architecture-stt-llm-tts-pipelines-explained" target="_blank">LiveKit: STT/LLM/TTS pipelines</a> (25m).</li>
-    <li><a href="https://softcery.com/lab/ai-voice-agents-real-time-vs-turn-based-tts-stt-architecture" target="_blank">Softcery: real-time vs turn-based 2026</a> (20m) — cascaded vs speech-to-speech vs hybrid.</li></ul>
-    <p><b>Memorize the latency budget:</b> target ~800ms voice-to-voice (&lt;500ms great, &gt;1.5s broken). VAD 50–200ms → streaming ASR 100–500ms → LLM TTFT ~350ms+ → TTS TTFA 75–200ms → transport (WebRTC 30–50ms; PSTN more). The trick is <b>overlap, not speed</b>. Know: VAD vs semantic turn-detection; barge-in = detect speech → stop TTS → cancel LLM → truncate context to what was heard; telephony 8kHz vs WebRTC 16–48kHz; why Sarvam-30B (~2.4B active params) fits cheap low-latency voice.</p>
-    <div class="donewhen"><b>Done when:</b> you can whiteboard the streaming pipeline with per-stage numbers and narrate barge-in end-to-end.</div>`},
-  { t:"10:30–12:30", title:"Build #2 — VAD from scratch + Sarvam voice loop", html:`<ol>
-    <li><b>(~45m) VAD in numpy, no framework</b> (their reported hackathon task): read WAV → 20–30ms frames, 10ms hop → short-time energy + zero-crossing rate → adaptive noise-floor threshold + hangover smoothing → speech segments with timestamps. Compare vs <span class="kbd">webrtcvad</span>/Silero. Vocabulary: sample rate, frame size, hop, SNR, hangover. Commit to <span class="kbd">build-2/vad/</span>.</li>
-    <li><b>(~75m) Minimal Sarvam voice loop</b>: <a href="https://github.com/sarvamai/skills" target="_blank">skills repo voice-agents skill</a> (LiveKit/Pipecat) or cookbook — audio in → Saaras v3 <b>WebSocket streaming STT</b> → Sarvam-30B → <b>Bulbul v3 streaming TTS</b> → audio out. Half-duplex is fine. Fallback: run STT-streaming and TTS-streaming notebooks separately, glue file-to-file. Commit to <span class="kbd">build-2/agent/</span>.</li></ol>`},
+
+  { t:"08:00–10:30", title:"Voice-agent architecture — top reading of the sprint", html:`
+    <div class="goal"><b>Goal:</b> whiteboard-level fluency in real-time voice pipelines — the domain of their revenue product and their reported hackathon.</div>
+    <ol>
+      <li>(~2 h) Read <a href="https://voiceaiandvoiceagents.com/" target="_blank">"Voice AI &amp; Voice Agents: An Illustrated Primer"</a> (by the Daily/Pipecat team — THE canonical resource). Focus sections: latency budget, turn detection/VAD, interruption handling, telephony vs WebRTC, context management. If badly pressed for time, use <a href="https://www.joeywang.blog/blog/voice-ai" target="_blank">the condensed notes</a> (30 min) — but prefer the full primer.</li>
+      <li>(25 min) <a href="https://livekit.com/blog/voice-agent-architecture-stt-llm-tts-pipelines-explained" target="_blank">LiveKit — "Voice agent architecture: STT, LLM, TTS pipelines explained"</a> — the streaming/overlap mechanics with per-stage numbers.</li>
+      <li>(20 min) <a href="https://softcery.com/lab/ai-voice-agents-real-time-vs-turn-based-tts-stt-architecture" target="_blank">Softcery — "Real-Time vs Turn-Based Voice Agents in 2026"</a> — cascaded pipeline vs speech-to-speech (OpenAI Realtime / Gemini Live) vs hybrid, with latency + cost numbers.</li>
+      <li><b>Memorize the latency budget cold</b> (write it in notes.md, then recite):<br>
+        • Target ~<b>800 ms</b> voice-to-voice; &lt;500 ms feels great, &gt;1.5 s feels broken.<br>
+        • VAD/turn-detection 50–200 ms → streaming ASR partials 100–500 ms → LLM time-to-first-token ~350 ms+ → streaming TTS time-to-first-audio 75–200 ms → transport (WebRTC 30–50 ms; PSTN adds more).<br>
+        • The trick is <b>overlap, not speed</b>: ASR partials feed the LLM early; LLM tokens stream into TTS sentence-by-sentence.<br>
+        • <b>Barge-in</b> = detect user speech during playback → stop TTS → cancel in-flight LLM → truncate context to what was actually heard.<br>
+        • VAD (Silero) vs semantic turn-detection · telephony (SIP/PSTN, 8 kHz) vs WebRTC (16–48 kHz) · why Sarvam-30B (~2.4B active params, MoE) fits cheap low-latency voice.</li>
+      <li>Closing drill: whiteboard the full streaming pipeline from memory with per-stage latency numbers, and narrate barge-in end-to-end.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Optional</div><ul>
+      <li><a href="https://github.com/pipecat-ai/pipecat" target="_blank">Pipecat</a> (frame-based pipeline DAG) · <a href="https://webrtc.ventures/2026/03/choosing-a-voice-ai-agent-production-framework/" target="_blank">framework comparison (Mar 2026)</a> — know when Pipecat (Python pipeline control) vs LiveKit Agents (WebRTC/SIP native)</li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> the whiteboard drill works — full pipeline, per-stage numbers, barge-in narration, no notes.</div>`},
+
+  { t:"10:30–12:30", title:"Build #2 — VAD from scratch + Sarvam voice loop", html:`
+    <div class="goal"><b>Goal:</b> hands-on the two things their interview reportedly tests: raw audio processing (a documented hackathon task was literally "build a VAD") and their streaming speech APIs. Full brief in <span class="kbd">build-2/README.md</span>.</div>
+    <p><b>Part 1 (~45 min) — VAD in numpy, no frameworks</b> → commit to <span class="kbd">build-2/vad/</span>:</p>
+    <ol>
+      <li>Load a WAV (use <span class="kbd">soundfile</span>; grab sample audio from the cookbook's <span class="kbd">sample_data/</span>).</li>
+      <li>Frame it: 20–30 ms windows, 10 ms hop.</li>
+      <li>Per frame compute <b>short-time energy</b> + <b>zero-crossing rate</b>.</li>
+      <li>Adaptive threshold from a noise-floor estimate (e.g., first 100 ms), plus <b>hangover smoothing</b> so speech doesn't flicker off between words.</li>
+      <li>Output speech segments with timestamps; compare against <span class="kbd">webrtcvad</span> (already in requirements.txt) on the same file.</li>
+      <li>Vocabulary to be fluent in: sample rate, frame size, hop length, SNR, hangover.</li>
+    </ol>
+    <p><b>Part 2 (~75 min) — minimal Sarvam voice loop</b> → commit to <span class="kbd">build-2/agent/</span>:</p>
+    <ol>
+      <li>Reference: the <b>voice-agents skill</b> in <a href="https://github.com/sarvamai/skills" target="_blank">sarvamai/skills</a> (LiveKit + Pipecat pipelines on Sarvam's stack) or the cookbook's streaming notebooks.</li>
+      <li>Pipeline: WAV in → <b>Saaras v3 WebSocket streaming STT</b> → Sarvam-30B chat completion → <b>Bulbul v3 streaming TTS</b> → WAV out. Half-duplex/turn-based is fine.</li>
+      <li>No mic in a Codespace — work <b>file-to-file</b>; the learning is in the streaming APIs, WS lifecycle, audio formats, and chunking, not the microphone.</li>
+      <li>Fallback if plumbing fights you: run the cookbook's STT-streaming and TTS-streaming notebooks separately and glue them file-to-file.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Resources</div><ul>
+      <li><a href="https://github.com/sarvamai/skills" target="_blank">sarvamai/skills (voice-agents)</a> · <a href="https://github.com/sarvamai/sarvam-ai-cookbook" target="_blank">cookbook stt/tts notebooks</a></li>
+      <li>Model docs: <a href="https://docs.sarvam.ai/api-reference-docs/models/saaras" target="_blank">Saaras v3</a> · <a href="https://docs.sarvam.ai/api-reference-docs/models/bulbul" target="_blank">Bulbul v3</a> <span class="tag">(gotcha: v3 rejects pitch/loudness params)</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> your VAD's segments roughly match webrtcvad's, and a WAV question goes in one end of your pipeline and a spoken answer comes out the other. Both committed + pushed.</div>`},
+
   { t:"12:30–13:00", title:"Lunch", html:`<p class="note">Step away.</p>`},
-  { t:"13:00–14:30", title:"Kafka, SQS, reliability vocabulary", html:`<ol>
-    <li><a href="https://www.youtube.com/watch?v=B7CwU_tNYIE" target="_blank">Nana's Kafka crash course</a> (1h @1.5x ≈ 45m) or <a href="https://developer.confluent.io/courses/apache-kafka/events/" target="_blank">Confluent Kafka 101</a>. Words: topic, partition, broker, replication, acks, <b>consumer group</b>, offset, retention, compaction.</li>
-    <li>ByteByteGo (15m): <a href="https://blog.bytebytego.com/p/ep126-the-ultimate-kafka-101-you" target="_blank">Kafka 101</a> + <a href="https://blog.bytebytego.com/p/why-is-kafka-fast" target="_blank">Why is Kafka fast?</a></li>
-    <li><a href="https://www.svix.com/resources/faq/kafka-vs-sqs/" target="_blank">SQS vs Kafka</a> (15m): SQS = managed task queue, competing consumers, no replay; Kafka = durable log, replay, fan-out, streaming. Azure mapping: Service Bus↔SQS, Event Hubs↔Kafka.</li>
-    <li><a href="https://baxchain.com/blogs/resilient-event-driven-architecture-idempotency-retries-and-dead-letter-queues/" target="_blank">Reliability patterns</a> (15m): backoff+jitter+retry caps, poison → DLQ, idempotency keys (at-least-once ⇒ duplicates WILL happen), circuit breakers, backpressure.</li></ol>
-    <div class="donewhen"><b>Done when:</b> you can design "WhatsApp bot for a bank: webhook → queue → agent workers → callback", justify SQS vs Kafka, place the DLQ and the idempotency key.</div>`},
-  { t:"14:30–15:30", title:"AI system design drills (2 paper sketches)", html:`<p>Read fast (40m): <a href="https://huyenchip.com/2024/07/25/genai-platform.html" target="_blank">Chip Huyen: GenAI platform</a> + skim <a href="https://www.systemdesignhandbook.com/guides/llm-system-design/" target="_blank">LLM system design guide</a>.</p>
-    <ol><li><b>LIC-scale multilingual voice policy servicing</b> (SBI Life shape: 80M customers, 11 languages): SIP ingress → code-mixed streaming STT → dialog agent w/ tool calls into core systems (read vs write, human handoff) → streaming TTS; queue between webhooks and workers; observability = transcripts+traces+eval sampling; on-prem variant; cost model (voice ~₹1/min — what dominates?).</li>
-    <li><b>Media dubbing pipeline</b>: demux → time-stamped ASR (anchor) → diarization → MT with <b>length/verbosity control</b> → TTS with <b>per-utterance duration fitting</b> → re-mux with original background; HITL QC; batch queues. Gotchas from <a href="https://arxiv.org/pdf/2001.06785" target="_blank">Amazon dubbing paper</a>: prosodic alignment, isochrony, background preservation.</li></ol>`},
-  { t:"15:30–16:30", title:"Sarvam memorization block", html:`<p>Drill the <b>Cheat Sheet tab</b> until you can recite: model lineup, API surface, Samvaad/Arya/Indus, tokenizer-fertility story, sovereignty narrative, partnerships, 2026 timeline. Self-quiz: which model/mode for a Hinglish support call? A 500-page Kannada PDF? A low-latency voice agent? LaTeX-preserving translation?</p>`},
-  { t:"16:30–17:30", title:"Mock decomp round (timed 45m + 15m review)", html:`<p>Method first (10m): <a href="https://www.coditioning.com/blog/703/palantir-swe-decomposition-interview" target="_blank">Palantir-style decomp guide</a>. Ask-before-solving → entities/data flows → explicit v1 with justification → failure modes unprompted → think out loud (silence = stuck).</p>
-    <p>Then one 45-min mock with an LLM as interviewer: <i>"You are an FDE interviewer at an Indian AI company. Give me one ambiguous enterprise problem (e.g., a large private bank wants to automate loan-collection calls in 8 languages), push back with realistic constraints (compliance, legacy systems, latency, cost) as I think out loud. Grade me on structure, questions asked, v1 scoping."</i></p>`},
+
+  { t:"13:00–14:30", title:"Kafka, SQS, and reliability vocabulary", html:`
+    <div class="goal"><b>Goal:</b> working vocabulary for the JD's "systems thinker … Kafka, SQS, or equivalent" line — decision frameworks, not ops depth.</div>
+    <ol>
+      <li>(~45 min at 1.5x) <a href="https://www.youtube.com/watch?v=B7CwU_tNYIE" target="_blank">TechWorld with Nana — Kafka crash course</a> (Python + Docker), or the <a href="https://developer.confluent.io/courses/apache-kafka/events/" target="_blank">Confluent Kafka 101 videos</a> if you prefer short segments. Must-know words: topic · <b>partition</b> (the ordering + parallelism unit) · broker · replication factor · producer acks · <b>consumer group</b> (scaling + rebalancing) · offset · retention · log compaction.</li>
+      <li>(15 min) ByteByteGo visuals: <a href="https://blog.bytebytego.com/p/ep126-the-ultimate-kafka-101-you" target="_blank">The Ultimate Kafka 101</a> + <a href="https://blog.bytebytego.com/p/why-is-kafka-fast" target="_blank">Why is Kafka fast?</a> (sequential I/O, zero-copy, batching).</li>
+      <li>(15 min) The decision framework: <a href="https://www.svix.com/resources/faq/kafka-vs-sqs/" target="_blank">Kafka vs SQS (Svix)</a> + <a href="https://techunfiltered.dev/sqs-vs-kafka-when-to-use-what-in-real-systems" target="_blank">when to use what</a>. SQS = fully-managed task queue, competing consumers, no replay · Kafka = durable log, replay, fan-out to many consumer groups, streaming · SQS FIFO for ordering · ops cost of self-managed brokers. Your Azure mapping: Service Bus ↔ SQS, Event Hubs ↔ Kafka.</li>
+      <li>(15 min) Reliability patterns: <a href="https://baxchain.com/blogs/resilient-event-driven-architecture-idempotency-retries-and-dead-letter-queues/" target="_blank">idempotency, retries, DLQs</a> — retries with exponential backoff + jitter + a cap · poison messages → <b>dead-letter queue</b> · <b>idempotency keys</b> (at-least-once delivery means duplicates WILL happen) · circuit breakers · backpressure (bounded queues, 429/503 + Retry-After).</li>
+      <li>(10 min) Closing drill in <span class="kbd">notes.md</span>: design "WhatsApp bot for a bank — webhook ingestion → queue → agent workers → callback." Justify SQS vs Kafka, place the DLQ, place the idempotency key.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Optional quick hits</div><ul>
+      <li><a href="https://hookdeck.com/webhooks/guides/when-to-use-webhooks" target="_blank">Webhooks vs polling</a> + <a href="https://www.svix.com/resources/faq/webhooks-vs-api-polling/" target="_blank">Svix FAQ</a> <span class="tag">15m</span> · <a href="https://www.digitalapplied.com/blog/background-job-queue-patterns-2026-engineering-reference" target="_blank">background-job patterns 2026</a></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> the WhatsApp-bot drill is written out and you can defend every choice in it.</div>`},
+
+  { t:"14:30–15:30", title:"AI system design drills — two paper sketches", html:`
+    <div class="goal"><b>Goal:</b> rehearse the two system designs most likely to appear in a Sarvam FDE loop, timed, on paper.</div>
+    <ol>
+      <li>(40 min reading) <a href="https://huyenchip.com/2024/07/25/genai-platform.html" target="_blank">Chip Huyen — "Building A Generative AI Platform"</a> (the step-by-step buildup: RAG → gateway → caching → guardrails → model router → observability), then skim <a href="https://www.systemdesignhandbook.com/guides/llm-system-design/" target="_blank">LLM System Design Guide (2026)</a> for the interview format: clarify use case/token budgets → orchestration → routing, fallbacks, cost control, failure modes.</li>
+      <li>(10 min, timed) <b>Sketch 1 — LIC-scale multilingual voice policy servicing</b> (their real SBI Life deployment shape: 80M customers, 11 languages): telephony/SIP ingress → code-mixed streaming STT → dialog agent with tool calls into core policy systems (separate read vs write paths; human handoff) → streaming TTS · queue between webhook events and workers · observability = transcripts + traces + eval sampling · on-prem/VPC variant for compliance · cost model (voice ~₹1/min — what dominates: LLM tokens vs ASR vs telephony?).</li>
+      <li>(10 min, timed) <b>Sketch 2 — translation/dubbing pipeline for a media house</b>: ingest video → demux → time-stamped ASR transcript (the anchor) → speaker diarization → MT with <b>length/verbosity control</b> → TTS with <b>per-utterance duration fitting</b> + voice consistency → re-mux with original background audio · human-in-the-loop QC stage · batch queue architecture. Gotchas from the <a href="https://arxiv.org/pdf/2001.06785" target="_blank">Amazon automatic-dubbing paper</a>: prosodic alignment, isochrony, background preservation. Current reference: <a href="https://www.sportsvideo.org/2026/05/14/nvidia-releases-content-localization-blueprint-for-ai-assisted-dubbing-and-speech-translation/" target="_blank">NVIDIA content-localization blueprint (May 2026)</a>.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Optional deeper</div><ul>
+      <li><a href="https://eugeneyan.com/writing/llm-patterns/" target="_blank">Eugene Yan — Patterns for LLM Systems</a> <span class="tag">7 patterns: evals, RAG, fine-tuning, caching, guardrails, defensive UX, feedback</span> · <a href="https://applied-llms.org/" target="_blank">applied-llms.org</a> <span class="tag">a year of operational lessons</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> both sketches exist on paper and each has an explicit v1 scope, failure modes, and a cost driver named.</div>`},
+
+  { t:"15:30–16:30", title:"Sarvam memorization block", html:`
+    <div class="goal"><b>Goal:</b> recite their stack cold — interviewers expect you to design with <i>their</i> models.</div>
+    <ol>
+      <li>Work through the <b>Cheat Sheet tab</b> top to bottom.</li>
+      <li>Recite without looking: model lineup + what each is for · API surface · Samvaad / Arya / Indus · the tokenizer-fertility story (~1.4–2.1 vs 4–8 tokens/word) · the sovereignty narrative · partnerships (Tata Capital, SBI Life, LIC, IDFC First, CRED) · the 2025–26 timeline.</li>
+      <li>Self-quiz — answer with a specific model + API mode: a Hinglish support call? (Saaras v3, code-mixed mode) · a 500-page Kannada PDF? (Sarvam Vision async jobs) · a low-latency voice agent? (Sarvam-30B + Bulbul v3 streaming) · translation preserving LaTeX? (Sarvam-Translate).</li>
+      <li>Skim their primary sources for 10 min so you've <i>seen</i> them: <a href="https://www.sarvam.ai/blogs/sarvam-30b-105b" target="_blank">30B/105B launch blog</a> · <a href="https://www.sarvam.ai/blogs/introducing-sarvam-arya" target="_blank">Arya announcement</a> · <a href="https://huggingface.co/sarvamai" target="_blank">their HF org</a>.</li>
+    </ol>
+    <div class="donewhen"><b>Done when:</b> all four self-quiz answers come out instantly and correctly.</div>`},
+
+  { t:"16:30–17:30", title:"Mock decomp round — timed 45 min + 15 min review", html:`
+    <div class="goal"><b>Goal:</b> one full-dress rehearsal of the canonical FDE round: an ambiguous customer problem, scoped out loud.</div>
+    <ol>
+      <li>(10 min) Read the method: <a href="https://www.coditioning.com/blog/703/palantir-swe-decomposition-interview" target="_blank">Palantir-style decomposition guide</a>. The sequence: <b>ask questions before solving</b> (users? actions? data volumes? constraints? cost of failure?) → name entities and data flows → scope an <b>explicit v1</b> with justification → state failure modes unprompted → think out loud continuously (silence reads as stuck).</li>
+      <li>(45 min, timed) Run one mock with an LLM as interviewer (Claude/ChatGPT, voice mode if available). Paste this prompt:<br><span class="kbd">You are an FDE interviewer at an Indian AI company. Give me one ambiguous enterprise problem (e.g., "a large private bank wants to automate loan-collection calls in 8 languages"), then push back on my scoping with realistic constraints (compliance, legacy systems, latency, cost) as I think out loud. Grade me at the end on structure, questions asked, and v1 scoping.</span></li>
+      <li>(15 min) Review the grade; write the top 2 fixes in <span class="kbd">notes.md</span> under "Mock decomp — feedback to fix."</li>
+    </ol>
+    <div class="rsrc"><div class="rh">More context on the round</div><ul>
+      <li><a href="https://medium.com/@anqi.silvia/my-palantir-decomposition-interview-mistakes-and-fixes-113e2a281bb6" target="_blank">First-person: decomp mistakes and fixes</a> · <a href="https://www.tryexponent.com/blog/forward-deployed-engineer-interview-the-definitive-2026-guide-fde" target="_blank">Exponent — FDE interview guide 2026</a> · <a href="https://gaijineer.co/openai-forward-deployed-engineer-interview-process" target="_blank">OpenAI FDE process writeup</a></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> the mock is complete and your top-2 fixes are written down.</div>`},
+
   { t:"17:30–18:00", title:"Break", html:`<p class="note">Last one. Use it.</p>`},
-  { t:"18:00–19:30", title:"Behavioral + narrative prep", html:`<p>Work the <b>Playbook tab</b>: write the 7 STAR stories (bullets, not scripts), rehearse the two deep-dive narratives (AIOps RCA; state-gov chatbots — the one that used Sarvam Doc Intelligence), pick 3 questions to ask. Extra bank: <a href="https://github.com/ashishps1/awesome-behavioral-interviews" target="_blank">awesome-behavioral-interviews</a>.</p>`},
-  { t:"19:30–20:30", title:"Coding insurance hour", html:`<ul><li>30m: 3–4 <a href="https://neetcode.io/practice" target="_blank">NeetCode</a> problems — arrays/hashing + two pointers only.</li>
-    <li>30m: rewrite your VAD from memory, faster; then read a WAV in chunks computing a rolling feature — streaming/audio-buffer fluency is what their format rewards.</li></ul>`},
-  { t:"20:30–21:00", title:"Final pass", html:`<p>Recite: latency budget, 5 workflow patterns, Write/Select/Compress/Isolate, evals playbook, SQS-vs-Kafka, Sarvam lineup. Optional 15m: <a href="https://jamwithai.substack.com/p/system-design-for-ai-engineers-7" target="_blank">7 patterns flashcards</a>. Logistics: mic/camera test, water, sleep. <b>No studying past 22:00.</b></p>`},
+
+  { t:"18:00–19:30", title:"Behavioral + narrative prep", html:`
+    <div class="goal"><b>Goal:</b> stories ready. For FDE loops the customer-scenario round quietly filters hardest — most coding-passers who fail, fail here.</div>
+    <ol>
+      <li>Open the <b>Playbook tab</b>. Write out the <b>7 STAR stories</b> as bullets (≈5 lines each, in <span class="kbd">notes.md</span> or on paper) — the table maps each story to a JD trait: own-the-arc · evals-from-data (AIOps RCA) · high agency (on-prem UAT) · difficult client · ambiguity (state-gov chatbots) · deadline shipping (1000+-doc pilot) · honest failure.</li>
+      <li>Rehearse out loud, once each, the two deep-dive narratives they'll drill: (a) the <b>AIOps RCA RAG system</b> — be ready for 20 minutes of "why"; (b) the <b>state-gov chatbots</b> — your Sarvam Document Intelligence connection; say the product names correctly.</li>
+      <li>Rehearse the three gap-handling lines (LangGraph / voice / AWS-GCP) from the Playbook tab — prepared honesty beats bluffing.</li>
+      <li>Pick your 3 questions to ask them (list in Playbook tab).</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Extra question banks</div><ul>
+      <li><a href="https://github.com/ashishps1/awesome-behavioral-interviews" target="_blank">awesome-behavioral-interviews</a> <span class="tag">STAR bank with sample answers</span> · <a href="https://www.tryexponent.com/questions?role=solutions-architect&type=behavioral" target="_blank">Exponent solutions-architect behavioral bank</a> <span class="tag">closest role match</span></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> 7 stories in bullets, both narratives rehearsed out loud once, 3 questions chosen.</div>`},
+
+  { t:"19:30–20:30", title:"Coding insurance hour", html:`
+    <div class="goal"><b>Goal:</b> fluency insurance. Evidence says their format is a practical hackathon (audio/streaming Python), not LeetCode — so weight practice accordingly.</div>
+    <ol>
+      <li>(30 min) 3–4 problems on <a href="https://neetcode.io/practice" target="_blank">NeetCode</a> — <b>arrays/hashing and two pointers only</b>. Skip everything else.</li>
+      <li>(15 min) Rewrite your energy-based VAD from memory, faster than this morning.</li>
+      <li>(15 min) One streaming exercise: read a WAV in fixed-size chunks and compute a rolling feature (e.g., running RMS) without loading the whole file — audio-buffer fluency is what their format rewards.</li>
+    </ol>
+    <div class="rsrc"><div class="rh">Context on what to expect</div><ul>
+      <li><a href="https://getpersonalisedcv.in/blog/sarvam-ai-interview-experience-84-lpa-ml-engineer" target="_blank">Sarvam interview account: 2.5-h proctored hackathon, VAD from scratch</a> · <a href="https://www.grapevine.in/round1/job-interview/e87b2eb9-8bcf-4122-8122-2afaa2500801" target="_blank">Grapevine thread</a> · <a href="https://www.datacamp.com/blog/ai-engineer-interview-questions" target="_blank">AI-engineer interview question survey</a></li>
+    </ul></div>
+    <div class="donewhen"><b>Done when:</b> the VAD rewrite works from memory and the chunked-RMS exercise runs.</div>`},
+
+  { t:"20:30–21:00", title:"Final pass", html:`
+    <div class="goal"><b>Goal:</b> lock in the six recitables and close the sprint.</div>
+    <ol>
+      <li>Recite, from memory: ① the voice latency budget ② the 5 workflow patterns ③ Write/Select/Compress/Isolate ④ your evals playbook ⑤ SQS-vs-Kafka decision framework ⑥ the Sarvam model lineup + timeline.</li>
+      <li>Review all flashcards in <span class="kbd">notes.md</span>; mark the shaky ones for weekend review.</li>
+      <li>(Optional, 15 min) Palate cleanser: <a href="https://jamwithai.substack.com/p/system-design-for-ai-engineers-7" target="_blank">System Design for AI Engineers: 7 patterns</a>.</li>
+      <li>Logistics: both builds run clean from a fresh terminal · Sarvam API key works · charge devices, test mic/camera for the real interview · confirm interview format with the recruiter if not already known.</li>
+      <li><b>No studying past 22:00.</b> Retention beats one more blog post.</li>
+    </ol>
+    <div class="donewhen"><b>Done when:</b> all six recitables come out clean, and you're offline by 22:00.</div>`},
 ]}];
 
 // ---------- Static tabs ----------
