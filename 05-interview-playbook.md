@@ -1,21 +1,19 @@
 # Interview Playbook
 
-## What the process likely looks like
+## The CONFIRMED process (insider info via a friend, July 2026)
 
-From researched reports (secondary sources — confirm the actual loop with the recruiter):
-recruiter/briefing call → a **timed practical task** (reported as ~1-hour live task or a
-~2.5-hour proctored hackathon; one documented task was **building a Voice Activity Detector
-from scratch** — audio buffers, sample rates, streaming, no LeetCode) → one or two
-**solution-walkthrough deep-dives** probing whether you actually understand what you built →
-founder/leadership conversation. Sarvam's FDE JD emphasizes: agents across voice/WhatsApp/web,
-eval pipelines, debugging failure modes from production data, and client-facing ownership.
+| Round | What it is | How to prep |
+|---|---|---|
+| **R1 — Coding Assessment** | Code **read AND write** + candidate background, **intent**, impact in previous role + general discussion | Code-reading drills (Days 1/3/4), light DSA, career narrative with impact numbers, crisp "why Sarvam / why FDE" (= the "intent") |
+| **R2 — Business Case Study** | Business and technical scenarios; they evaluate your thinking | Decomp method + system-design sketches + two timed mocks (Day 4). Business framing: v1 scope, cost, ROI, success metrics |
+| **R3 — Live Build** | Problem given on the spot; build a small application **using the help of AI** | The AI-assisted loop: spec → prompt → **verify** → iterate → demo. Drilled Day 2, full rehearsal Day 4. Narrate while driving the AI; catch its mistakes out loud |
+| **R4 — Hiring Manager** | Fit, ownership, expectations | STAR stories + deep-dive narratives + 3 questions |
 
-Generic FDE loop archetype (Palantir/OpenAI pattern) to also be ready for:
-1. **Practical coding** — build a small agent/RAG/integration live against an API.
-2. **Decomposition round** — ambiguous customer problem, scope it out loud.
-3. **System design** — production AI system with latency/cost/reliability constraints.
-4. **Customer scenario / behavioral** — this round quietly filters hardest for FDE roles;
-   reports on comparable loops say most coding-passers who fail, fail here.
+R3 note: never accept AI output unread — catching its mistakes IS the test. A running ugly
+app beats a beautiful fragment; save 5 minutes to demo.
+
+(Earlier secondary reports — proctored hackathon, VAD-from-scratch — may apply to other
+tracks; the audio/streaming fluency still pays off in R1/R3.)
 
 ## The decomp method (memorize the sequence)
 
