@@ -216,7 +216,8 @@ const days = [
   { t:"12:30–13:15", title:"Lunch", html:`<p class="note">Step away. Close the LangGraph gap from the warm-up if there was one.</p>`},
 
   { t:"13:15–16:15", title:"Build #1 — Sarvam-stack agent + eval harness (solo-typed)", html:`
-    <div class="goal"><b><span class="round">R1</span>Goal:</b> a real, runnable thing on Sarvam's APIs with your evals playbook made concrete. Solo-typed deliberately — the AI-assisted drill comes right after, as its own exercise. Full brief in <span class="kbd">build-1/README.md</span>.</div>
+    <div class="goal"><b><span class="round">R1</span>Goal:</b> a real, runnable thing on Sarvam's APIs with your evals playbook made concrete. Full brief in <span class="kbd">build-1/README.md</span>.</div>
+    <p><b>▶ Doing this with Claude Code?</b> Follow the phase-by-phase roadmap with ready-made prompts: <a href="https://github.com/pansaryabbasali/FDE_prep/blob/claude/repo-write-access-0ls5dn/build-1/ROADMAP.md" target="_blank">build-1/ROADMAP.md</a> — open it in your Codespace and tell Claude Code: <span class="kbd">Read build-1/ROADMAP.md and follow it phase by phase; stop after each phase for my review.</span></p>
     <p><b>Option A (recommended) — BFSI call analytics</b> (mirrors their Samvaad business):</p>
     <ol>
       <li>Start from the cookbook's <span class="kbd">call-analytics</span> example (sample audio in <span class="kbd">sample_data/</span>).</li>
@@ -235,6 +236,7 @@ const days = [
 
   { t:"16:45–17:30", title:"AI-assisted extension drill (timed 45 min)", html:`
     <div class="goal"><b><span class="round">R3</span>Goal:</b> first rehearsal of R3's actual skill — building <i>with</i> an AI assistant, fast, while staying in control. This is a different muscle from solo coding: spec → prompt → <b>verify</b> → iterate.</div>
+    <p><b>▶ Full timed protocol</b> (extension options, the loop, retro template) is in the second half of <a href="https://github.com/pansaryabbasali/FDE_prep/blob/claude/repo-write-access-0ls5dn/build-1/ROADMAP.md" target="_blank">build-1/ROADMAP.md</a>.</p>
     <ol>
       <li>Choose an extension to Build #1, e.g.: add language-identification routing (route Hindi vs English calls to different prompts), or generate an HTML report page of all processed calls, or add a second judge and report agreement.</li>
       <li>Set a 45-min timer. Use an AI coding assistant — Copilot Chat in the Codespace, or a claude.ai/code session on your repo.</li>
