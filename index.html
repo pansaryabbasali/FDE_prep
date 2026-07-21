@@ -61,6 +61,8 @@
   .note { color: var(--muted); font-size: 0.85rem; }
   ul.tight { padding-left: 20px; margin: 6px 0; } ul.tight li { margin-bottom: 5px; }
   .reset { border: 1px solid var(--border); background: none; color: var(--muted); border-radius: 6px; padding: 4px 10px; font-size: .78rem; cursor: pointer; }
+  pre { background: var(--accent-soft); padding: 8px 10px; border-radius: 8px; overflow-x: auto; font-size: .82rem; line-height: 1.4; margin: 6px 0; }
+  details.ans { margin: 4px 0 14px; } details.ans summary { cursor: pointer; color: var(--accent); font-size: .85rem; font-weight: 600; }
   .round { display:inline-block; font-size:.72rem; font-weight:700; background:var(--accent); color:#fff; border-radius:6px; padding:1px 7px; margin-right:4px; }
 </style>
 </head>
@@ -366,9 +368,9 @@ const days = [
   blocks:[
 
   { t:"09:00–10:00", title:"R1 rehearsal (a) — code read + write", html:`
-    <div class="goal"><b><span class="round">R1</span>Goal:</b> warm and fast on both halves of the coding round.</div>
+    <div class="goal"><b><span class="round">R1</span>Goal:</b> warm and fast on both halves of the coding round. Confirmed format: basic syntax + logic written from scratch in a Word doc — use the <b>R1 Drills tab</b> as the primary material.</div>
     <ol>
-      <li>(30 min) 2–3 problems on <a href="https://neetcode.io/practice" target="_blank">NeetCode</a> — <b>arrays/hashing and two pointers only</b>. Skip everything else.</li>
+      <li>(30 min) Retry pass from the <b>R1 Drills tab</b>: re-write from scratch every question you missed earlier, Word-doc conditions. If you missed none, do W13–W24 timed at 3 min each.</li>
       <li>(20 min) Timed code-reading: ask an LLM to "generate a 60-line Python function with subtle issues — mixed responsibilities, an off-by-one, a swallowed exception — and don't tell me what they are." You get 10 minutes to explain the code aloud and name the issues; then check.</li>
       <li>(10 min) One streaming exercise from memory: read a WAV in fixed-size chunks and compute a rolling RMS without loading the whole file.</li>
     </ol>
@@ -444,6 +446,313 @@ const days = [
 
 // ---------- Static tabs ----------
 const staticTabs = [
+{ id:"drills", label:"R1 Drills", html:`
+<div class="card"><h2 style="margin-top:0">R1 Python Drills — basic syntax + logic, written from scratch</h2>
+<p><b>Confirmed format:</b> R1 tests familiarity with Python syntax and logical coding — basic code written from scratch <b>in a Word doc</b> (no IDE, no autocomplete, no running). Example given: check if a year is a leap year.</p>
+<p><b>Practice protocol (mirror the real conditions):</b></p>
+<ol class="tight">
+<li>Open a blank text/Word doc. Pick 5–6 questions. <b>Write the code without running anything</b> — 5 min per question max.</li>
+<li>Only when done: paste into Python and run. Every error you find is gold — log it in <span class="kbd">notes.md</span> (syntax slips are exactly what this round screens for).</li>
+<li>Narrate while writing — the interviewer will likely discuss your code, so practice explaining as you go.</li>
+<li>Do the <b>Read</b> sections the same way: commit to an answer out loud BEFORE revealing it.</li>
+<li>Printable questions-only sheet: <a href="https://github.com/pansaryabbasali/FDE_prep/blob/claude/repo-write-access-0ls5dn/06-r1-python-drills.md" target="_blank">06-r1-python-drills.md</a>.</li>
+</ol></div>
+
+<div class="card"><h3 style="margin-top:0">Part A — Write from scratch · Tier 1: warm-ups</h3>
+
+<p><b>W1.</b> Leap year: write <span class="kbd">is_leap(year)</span> returning True/False. (The given example — know it cold.)</p>
+<details class="ans"><summary>Answer</summary><pre>def is_leap(year):
+    return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)</pre>
+<p class="note">The rule: divisible by 4, EXCEPT century years, UNLESS divisible by 400. 1900 → False, 2000 → True, 2024 → True. Be ready to explain the parentheses.</p></details>
+
+<p><b>W2.</b> FizzBuzz: print 1–100; multiples of 3 → "Fizz", of 5 → "Buzz", of both → "FizzBuzz".</p>
+<details class="ans"><summary>Answer</summary><pre>for i in range(1, 101):
+    if i % 15 == 0: print("FizzBuzz")
+    elif i % 3 == 0: print("Fizz")
+    elif i % 5 == 0: print("Buzz")
+    else: print(i)</pre>
+<p class="note">Classic trap: checking % 3 before % 15 — order matters.</p></details>
+
+<p><b>W3.</b> Prime check: <span class="kbd">is_prime(n)</span>.</p>
+<details class="ans"><summary>Answer</summary><pre>def is_prime(n):
+    if n &lt; 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True</pre>
+<p class="note">Mention the sqrt optimization out loud; a plain range(2, n) loop is also acceptable — say why sqrt is enough.</p></details>
+
+<p><b>W4.</b> Factorial — once with a loop, once with recursion.</p>
+<details class="ans"><summary>Answer</summary><pre>def fact_loop(n):
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+def fact_rec(n):
+    return 1 if n &lt;= 1 else n * fact_rec(n - 1)</pre></details>
+
+<p><b>W5.</b> Reverse a string — without slicing, then the one-liner.</p>
+<details class="ans"><summary>Answer</summary><pre>def reverse(s):
+    out = ""
+    for ch in s:
+        out = ch + out
+    return out
+
+# one-liner: s[::-1]</pre></details>
+
+<p><b>W6.</b> Palindrome check, ignoring case and spaces ("Nurses Run" → True).</p>
+<details class="ans"><summary>Answer</summary><pre>def is_pal(s):
+    s = s.replace(" ", "").lower()
+    return s == s[::-1]</pre></details>
+
+<p><b>W7.</b> Print the first n Fibonacci numbers.</p>
+<details class="ans"><summary>Answer</summary><pre>def fib(n):
+    a, b = 0, 1
+    for _ in range(n):
+        print(a)
+        a, b = b, a + b</pre>
+<p class="note">Tuple unpacking a, b = b, a+b avoids a temp variable — worth saying.</p></details>
+
+<p><b>W8.</b> Sum of digits of an integer (123 → 6). Once with strings, once with math.</p>
+<details class="ans"><summary>Answer</summary><pre>def digit_sum(n):
+    return sum(int(d) for d in str(abs(n)))
+
+def digit_sum_math(n):
+    n, total = abs(n), 0
+    while n:
+        total += n % 10
+        n //= 10
+    return total</pre></details>
+
+<p><b>W9.</b> Largest number in a list WITHOUT using max().</p>
+<details class="ans"><summary>Answer</summary><pre>def largest(nums):
+    biggest = nums[0]
+    for x in nums[1:]:
+        if x &gt; biggest:
+            biggest = x
+    return biggest</pre>
+<p class="note">Initialize from the list, not from 0 — fails on all-negative lists otherwise. Say that.</p></details>
+
+<p><b>W10.</b> Count vowels in a string.</p>
+<details class="ans"><summary>Answer</summary><pre>def count_vowels(s):
+    return sum(1 for ch in s.lower() if ch in "aeiou")</pre></details>
+
+<p><b>W11.</b> Swap two variables without a temp.</p>
+<details class="ans"><summary>Answer</summary><pre>a, b = b, a</pre></details>
+
+<p><b>W12.</b> GCD of two numbers (Euclid's algorithm).</p>
+<details class="ans"><summary>Answer</summary><pre>def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a</pre></details>
+</div>
+
+<div class="card"><h3 style="margin-top:0">Part A · Tier 2: strings &amp; collections</h3>
+
+<p><b>W13.</b> Word frequency: sentence → dict of word counts.</p>
+<details class="ans"><summary>Answer</summary><pre>def word_freq(sentence):
+    counts = {}
+    for word in sentence.lower().split():
+        counts[word] = counts.get(word, 0) + 1
+    return counts</pre>
+<p class="note">.get(word, 0) is the idiom to know; mention collections.Counter exists.</p></details>
+
+<p><b>W14.</b> First non-repeating character in a string ("swiss" → "w").</p>
+<details class="ans"><summary>Answer</summary><pre>def first_unique(s):
+    for ch in s:
+        if s.count(ch) == 1:
+            return ch
+    return None</pre>
+<p class="note">O(n²) but perfectly fine here. Bonus points: two-pass with a count dict is O(n).</p></details>
+
+<p><b>W15.</b> Check two strings are anagrams.</p>
+<details class="ans"><summary>Answer</summary><pre>def is_anagram(a, b):
+    return sorted(a.lower()) == sorted(b.lower())</pre></details>
+
+<p><b>W16.</b> Remove duplicates from a list, preserving order.</p>
+<details class="ans"><summary>Answer</summary><pre>def dedupe(items):
+    seen, out = set(), []
+    for x in items:
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out</pre>
+<p class="note">set(items) alone loses order — the classic wrong answer.</p></details>
+
+<p><b>W17.</b> Second largest number in a list (no duplicates assumed).</p>
+<details class="ans"><summary>Answer</summary><pre>def second_largest(nums):
+    first = second = float("-inf")
+    for x in nums:
+        if x &gt; first:
+            first, second = x, first
+        elif x &gt; second:
+            second = x
+    return second</pre>
+<p class="note">sorted(nums)[-2] also fine — offer both, note the one-pass version handles big lists better.</p></details>
+
+<p><b>W18.</b> Merge two already-sorted lists into one sorted list, without using sort().</p>
+<details class="ans"><summary>Answer</summary><pre>def merge(a, b):
+    i = j = 0
+    out = []
+    while i &lt; len(a) and j &lt; len(b):
+        if a[i] &lt;= b[j]:
+            out.append(a[i]); i += 1
+        else:
+            out.append(b[j]); j += 1
+    out.extend(a[i:])
+    out.extend(b[j:])
+    return out</pre></details>
+
+<p><b>W19.</b> Flatten a list of lists, one level ([[1,2],[3],[4,5]] → [1,2,3,4,5]).</p>
+<details class="ans"><summary>Answer</summary><pre>def flatten(lists):
+    out = []
+    for sub in lists:
+        out.extend(sub)
+    return out
+# or: [x for sub in lists for x in sub]</pre></details>
+
+<p><b>W20.</b> Invert a dict (values become keys; assume unique values).</p>
+<details class="ans"><summary>Answer</summary><pre>def invert(d):
+    return {v: k for k, v in d.items()}</pre></details>
+
+<p><b>W21.</b> Chunk a list into batches of size k ([1..7], k=3 → [[1,2,3],[4,5,6],[7]]).</p>
+<details class="ans"><summary>Answer</summary><pre>def chunk(items, k):
+    return [items[i:i + k] for i in range(0, len(items), k)]</pre>
+<p class="note">range's step argument + slicing beyond the end being safe — two idioms in one.</p></details>
+</div>
+
+<div class="card"><h3 style="margin-top:0">Part A · Tier 3: applied (FDE-flavored)</h3>
+
+<p><b>W22.</b> Parse "name=Asha;age=30;city=Pune" into a dict.</p>
+<details class="ans"><summary>Answer</summary><pre>def parse(s):
+    out = {}
+    for pair in s.split(";"):
+        key, value = pair.split("=", 1)
+        out[key] = value
+    return out</pre>
+<p class="note">split("=", 1) protects against values containing "=" — say it, it reads as production instinct.</p></details>
+
+<p><b>W23.</b> Given a list of log lines, count lines containing "ERROR" and return the first 3 of them.</p>
+<details class="ans"><summary>Answer</summary><pre>def error_summary(lines):
+    errors = [ln for ln in lines if "ERROR" in ln]
+    return len(errors), errors[:3]</pre></details>
+
+<p><b>W24.</b> Given [("asha", 91), ("ravi", 78), ("meena", 95)], return the names of the top 2 scorers.</p>
+<details class="ans"><summary>Answer</summary><pre>def top2(scores):
+    ranked = sorted(scores, key=lambda pair: pair[1], reverse=True)
+    return [name for name, score in ranked[:2]]</pre>
+<p class="note">sorted(key=lambda...) is the single most useful idiom in this whole set — be fluent in it.</p></details>
+</div>
+
+<div class="card"><h3 style="margin-top:0">Part B — Read: predict the output (commit before revealing)</h3>
+
+<p><b>P1.</b><pre>def add(item, items=[]):
+    items.append(item)
+    return items
+
+print(add(1))
+print(add(2))</pre></p>
+<details class="ans"><summary>Answer</summary><p>[1] then <b>[1, 2]</b> — the default list is created once and shared between calls. The most famous Python trap; fix with items=None + if items is None: items = [].</p></details>
+
+<p><b>P2.</b><pre>a = [1, 2, 3]
+b = a
+b.append(4)
+print(a)</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>[1, 2, 3, 4]</b> — b = a copies the reference, not the list. A real copy is a[:] or list(a).</p></details>
+
+<p><b>P3.</b><pre>print(7 // 2, 7 / 2, 7 % 2, 2 ** 3)</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>3 3.5 1 8</b> — // floors, / always gives float, % remainder, ** power.</p></details>
+
+<p><b>P4.</b><pre>s = "hello"
+s.upper()
+print(s)</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>hello</b> — strings are immutable; .upper() returns a new string that was thrown away.</p></details>
+
+<p><b>P5.</b><pre>nums = [3, 1, 2]
+result = nums.sort()
+print(result, nums)</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>None [1, 2, 3]</b> — .sort() sorts in place and returns None; sorted(nums) is the one that returns a list.</p></details>
+
+<p><b>P6.</b><pre>s = "sarvam"
+print(s[1:4], s[-3:], s[::-1])</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>arv vam mavras</b> — end index exclusive; negative indexes count from the end; [::-1] reverses.</p></details>
+
+<p><b>P7.</b><pre>nums = [1, 2, 3, 4, 5, 6]
+out = [x * x for x in nums if x % 2 == 0]
+print(out)</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>[4, 16, 36]</b> — filter first (evens), then square.</p></details>
+
+<p><b>P8.</b><pre>try:
+    print("a")
+    x = 1 / 0
+    print("b")
+except ZeroDivisionError:
+    print("c")
+finally:
+    print("d")</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>a c d</b> — "b" is skipped (exception raised before it), except catches, finally always runs.</p></details>
+
+<p><b>P9.</b><pre>d = {"a": 1}
+print(d.get("b"))
+print(d.get("b", 0))
+print(d["b"])</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>None</b>, then <b>0</b>, then <b>KeyError</b> (crash) — .get is safe with an optional default; [] raises on missing keys.</p></details>
+
+<p><b>P10.</b><pre>for i in range(1, 5):
+    pass
+print(i)</pre></p>
+<details class="ans"><summary>Answer</summary><p><b>4</b> — range(1, 5) ends at 4 (end exclusive), and the loop variable survives after the loop in Python.</p></details>
+</div>
+
+<div class="card"><h3 style="margin-top:0">Part C — Read: spot the bug (say the fix out loud)</h3>
+
+<p><b>B1.</b><pre>def is_leap(year):
+    return year % 4 == 0 and (year % 100 != 0 and year % 400 == 0)</pre></p>
+<details class="ans"><summary>Answer</summary><p>The inner condition should be <b>or</b>, not and: as written, no year can pass (can't be both not-divisible by 100 AND divisible by 400). 2000 wrongly returns False. Correct: year % 4 == 0 and (year % 100 != 0 <b>or</b> year % 400 == 0).</p></details>
+
+<p><b>B2.</b><pre>def total(nums):
+    s = 0
+    for i in range(len(nums) - 1):
+        s += nums[i]
+    return s</pre></p>
+<details class="ans"><summary>Answer</summary><p>Off-by-one: range(len(nums) - 1) skips the last element. Fix: range(len(nums)) — or just <b>for x in nums: s += x</b>, the more Pythonic form.</p></details>
+
+<p><b>B3.</b><pre>nums = [1, 2, 3, 4, 5, 6]
+for x in nums:
+    if x % 2 == 0:
+        nums.remove(x)
+print(nums)</pre></p>
+<details class="ans"><summary>Answer</summary><p>Mutating a list while iterating it skips elements (prints [1, 3, 5] here by luck, but the pattern is broken in general — consecutive evens get skipped). Fix: build a new list — [x for x in nums if x % 2 != 0].</p></details>
+
+<p><b>B4.</b><pre>def find_negative(nums):
+    for x in nums:
+        if x &lt; 0:
+            return True
+        else:
+            return False</pre></p>
+<details class="ans"><summary>Answer</summary><p>The else returns False on the FIRST element — the loop never sees the rest. [1, -2] wrongly returns False. Fix: return False only <b>after</b> the loop ends.</p></details>
+
+<p><b>B5.</b><pre>count = 5
+message = "Processed " + count + " files"
+print(message)</pre></p>
+<details class="ans"><summary>Answer</summary><p>TypeError — can't concatenate str and int. Fix: str(count), or better an f-string: f"Processed {count} files".</p></details>
+
+<p><b>B6.</b><pre>list = [1, 2, 3]
+pairs = list(zip(list, list))</pre></p>
+<details class="ans"><summary>Answer</summary><p>Naming a variable <b>list</b> shadows the built-in — the second line then calls a list object like a function → TypeError. Never shadow built-ins (list, dict, str, sum, max, id, type).</p></details>
+</div>
+
+<div class="card"><h3 style="margin-top:0">Session plan (fits today)</h3>
+<ol class="tight">
+<li><b>Session 1 (40 min):</b> W1–W12 in a Word doc, no running. Then run all, log every slip in notes.md.</li>
+<li><b>Session 2 (40 min):</b> W13–W24 same protocol.</li>
+<li><b>Session 3 (30 min):</b> P1–P10 + B1–B6, answers committed out loud before revealing.</li>
+<li><b>Retry pass (20 min, later or tomorrow):</b> re-write from scratch ONLY the ones you got wrong.</li>
+</ol>
+<p class="note">Passing bar: Tier 1 flawless and fast (≤3 min each), Tier 2 correct with minor slips, all P/B traps recognized. That's comfortably above "familiarity with syntax and logical coding".</p></div>`},
+
 { id:"gap", label:"Gap Analysis", html:`
 <div class="card"><h2 style="margin-top:0">Strengths — prep a talk track, don't study</h2>
 <div class="scroll"><table><tr><th>JD asks</th><th>Your evidence</th><th>Framing</th></tr>
